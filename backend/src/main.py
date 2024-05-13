@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from dotenv import load_dotenv
 import os
 import db_tools
+from fastapi.middleware.cors import CORSMiddleware #для настройки CORS
 
 
 from pydantic import BaseModel
@@ -88,6 +89,14 @@ app = FastAPI(
     version="0.0.1",
     openapi_tags=tags_metadata
     )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 #функции под тестовую авторизацию
