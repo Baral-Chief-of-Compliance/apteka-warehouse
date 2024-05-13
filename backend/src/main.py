@@ -64,15 +64,15 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    username : str | None = None
-    role: str | None = None
+    username : str or None = None
+    role: str or None = None
 
 class User(BaseModel):
     username: str
-    email: str | None = None
-    full_name: str | None = None
+    email: str or None = None
+    full_name: str or None = None
     role: str
-    disabled: bool | None = None
+    disabled: bool or None = None
 
 
 class UserInDB(User):
@@ -127,7 +127,7 @@ def authenticate_user(db, username: str, password: str):
 
 
 #создание токена для доступа access token
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: timedelta or None = None):
     to_encode = data.copy()
     if expires_delta:
         expier = datetime.now() + expires_delta

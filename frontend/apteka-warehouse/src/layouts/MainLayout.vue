@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          Аптека
+          Административная панель
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>ООО "Здоровье"</div>
       </q-toolbar>
     </q-header>
 
@@ -28,7 +28,7 @@
         <q-item-label
           header
         >
-          Essential Links
+          Навигация
         </q-item-label>
 
         <EssentialLink
@@ -55,46 +55,40 @@ defineOptions({
 
 const linksList = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
+    title: 'Склады',
+    caption: 'просмотр, добавление, удаление',
+    icon: 'warehouse',
+    link: 'Warehouse'
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
+    title: 'Аптеки',
+    caption: 'просмотр, добавление, удаление',
+    icon: 'domain',
+    link: 'Pharmacy'
   },
   {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
+    title: 'Постащики',
+    caption: 'просмотр, добавление, удаление',
     icon: 'chat',
-    link: 'https://chat.quasar.dev'
+    link: 'Supplier'
   },
   {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
+    title: 'Медикаменты',
+    caption: 'просмотр, добавление, удаление',
+    icon: 'medication',
+    link: 'Medication'
   },
   {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
+    title: 'Заказы',
+    caption: 'просмотр, добавление, удаление',
+    icon: 'circle',
+    link: 'Order'
   },
   {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+    title: 'Пользователи',
+    caption: 'просмотр, добавление, удаление',
+    icon: 'person',
+    link: 'Users'
   }
 ]
 

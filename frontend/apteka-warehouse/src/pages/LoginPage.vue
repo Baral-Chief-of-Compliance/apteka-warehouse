@@ -1,7 +1,7 @@
 <template>
     <q-page class="flex flex-center">
         <q-card class="my-card">
-            <img src="https://izvestiaur.ru/upload/resize_cache/iblock/cb4/3pz6o3i7kh0jttgrh3rroqueh54k7z3m/888_500_2/lekarstva.jpg">
+            <img height="300px" src="https://img.freepik.com/free-photo/packings-of-pills-and-capsules-of-medicines_1339-2254.jpg">
             <q-card-section>
                 <div class="text-h6">ООО "Здоровье"</div>
                 <div class="text-subtitle2">Административная панель</div>
@@ -66,8 +66,9 @@ function login(){
     .then(function (response) {
         state.mistakeStatus = false;
         state.successEnter = true;
-        console.log(response);
-        console.log(response.data.access_token);
+        
+        // помещаем токен в локал сторадж для хранения
+        localStorage.setItem("access_token", response.data.access_token)
     })
     .catch(function (error) {
         console.log(error);

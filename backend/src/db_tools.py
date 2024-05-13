@@ -23,7 +23,7 @@ def connectionDB():
 
 #модель под аптеку 
 class Pharmacy(BaseModel):
-    ph_id : int | None = None
+    ph_id : int or None = None
     ph_address : str
     ph_phone_number : str
 
@@ -145,7 +145,7 @@ def updatePharmacy(pharmacy : Pharmacy) -> None:
 
 #модель для поставщика
 class Supplier(BaseModel):
-    s_id : int | None = None
+    s_id : int or None = None
     s_name : str
 
 
@@ -242,7 +242,7 @@ def updateSupplier(supplier: Supplier) -> None:
 
 #модель склада 
 class Warehouse(BaseModel):
-    w_id : int | None = None
+    w_id : int or None = None
     w_address : str
     w_director : str
     w_phone_number : str
@@ -353,7 +353,7 @@ def updateWarehouse(warehouse:Warehouse) -> None:
 
 #модель медикамента
 class Medication(BaseModel):
-    med_id : int|None = None
+    med_id : int or None = None
     med_name : str
     med_category : str
     med_dosage : float

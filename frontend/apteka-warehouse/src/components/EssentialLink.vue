@@ -1,9 +1,7 @@
 <template>
   <q-item
     clickable
-    tag="a"
-    target="_blank"
-    :href="props.link"
+    @click="router.push({name: props.link})"
   >
     <q-item-section
       v-if="props.icon"
@@ -20,6 +18,13 @@
 </template>
 
 <script setup>
+import { useRouter, useRoute } from 'vue-router'
+
+
+// роутер
+const router = useRouter()
+
+
 defineOptions({
   name: 'EssentialLink'
 })
