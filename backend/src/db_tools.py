@@ -26,6 +26,7 @@ class Pharmacy(BaseModel):
     ph_id : int or None = None
     ph_address : str
     ph_phone_number : str
+    ph_name: str
 
 
 #добавить аптеку
@@ -39,8 +40,8 @@ def addPharmacy(pharmacy : Pharmacy) -> None:
 
         cursor = conn.cursor()
 
-        cursor.execute('''INSERT INTO pharmacy (ph_address, ph_phone_number) VALUES (%s,%s)''', 
-                       (pharmacy.ph_address, pharmacy.ph_phone_number)
+        cursor.execute('''INSERT INTO pharmacy (ph_address, ph_phone_number, ph_name) VALUES (%s,%s, %s)''', 
+                       (pharmacy.ph_address, pharmacy.ph_phone_number, pharmacy.ph_name)
                        )
         
         conn.commit()
@@ -76,7 +77,8 @@ def getAllPharmacy() -> list:
             result.append({
                 "ph_id": p[0],
                 "ph_address": p[1],
-                "ph_phone_number": p[2]
+                "ph_phone_number": p[2],
+                "ph_name": p[3]
             })
         
         conn.commit()
@@ -123,11 +125,13 @@ def updatePharmacy(pharmacy : Pharmacy) -> None:
         cursor.execute('''
                        UPDATE pharmacy SET 
                        ph_address=%s, 
-                       ph_phone_number=%s
+                       ph_phone_number=%s,
+                       ph_name=%s
                        WHERE ph_id=%s''', 
                        (
                            pharmacy.ph_address,
                            pharmacy.ph_phone_number,
+                           pharmacy.ph_name,
                            pharmacy.ph_id
                            )
                        )
