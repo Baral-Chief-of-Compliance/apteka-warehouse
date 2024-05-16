@@ -15,6 +15,11 @@ const routes = [
         component: () => import('pages/WarehousePage.vue'),
         name: 'Warehouse'
       },
+      {
+        path: '/warehouse/:w_id',
+        component: () => import ('pages/WarehouseInfoPage.vue'),
+        name: 'WarehouseInfo'
+      },
 
       //поставщики
       {

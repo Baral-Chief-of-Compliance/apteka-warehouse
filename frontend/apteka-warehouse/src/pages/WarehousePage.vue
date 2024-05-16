@@ -26,7 +26,7 @@
       <!-- Изменяем отображение для колонки информации об складе -->
       <template v-slot:body-cell-info="props">
         <q-td :props="props">
-          <q-btn color="primary" icon="info"></q-btn>
+          <q-btn color="primary" icon="info" @click="router.push({name: 'WarehouseInfo', params: {w_id:props.row.w_id}})"></q-btn>
         </q-td>
       </template>
 
@@ -137,8 +137,11 @@
 <script setup> 
 import axios from 'axios';
 import { onMounted, onUpdated, reactive } from 'vue';
+import { useRouter } from 'vue-router';
 
 
+//роутер
+const router = useRouter();
 
 
 //сотояние страницы

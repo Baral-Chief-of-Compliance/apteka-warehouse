@@ -51,7 +51,7 @@
       <!-- изменяем отображение для колонки удаление данных -->
       <template v-slot:body-cell-delete="props">
         <q-td :props="props">
-          <q-btn color="red" icon="delete" @click="deleteMed(props.row.w_id)"></q-btn>
+          <q-btn color="red" icon="delete" @click="deleteMed(props.row.med_id)"></q-btn>
         </q-td>
       </template>
     
@@ -80,10 +80,16 @@
           <div>
             <q-input  type="text" label="Название" v-model="state.add_med_name" />
             <q-input  type="text" label="Категория" v-model="state.add_med_category" />
-            <q-input type="float" label="Доза" v-model=state.med_dosage />
-            <q-input type="float" label="Цена" v-model=state.add_med_price />
+            <q-input type="number" step="0.01" label="Доза" v-model=state.add_med_dosage />
+            <q-input type="number" step="0.01" min="0.00" max="10000.00" label="Цена" v-model=state.add_med_price />
             <q-input type="date" label="Истечение срока годности" v-model=state.add_med_expiration_date />
             <q-input type="date" label="Дата поступления" v-model=state.add_med_receipts />
+
+
+          </div>
+          <span class="q-ma-xl text-h6 center">Выберите поставщика</span>
+          <div class="column">
+            <q-radio v-for="s in state.supplier" :key="s.s_id" v-model="state.add_supplierID" :val="s.s_id" :label="s.s_name" />
           </div>
         </q-card-section>
 
@@ -91,8 +97,8 @@
         <q-card-actions align="right">
           <q-btn flat label="Отмена" color="red" v-close-popup />
 
-          <!-- кнопка для добавления склада, появялется при условии -->
-          <q-btn v-if="true" 
+          <!-- кнопка для добавления медикамента, появялется при условии -->
+          <q-btn v-if="state.add_supplierID != null" 
           flat label="Добавить" color="green" @click="addMed()" />
         </q-card-actions>
       </q-card>
@@ -100,22 +106,29 @@
     <!-- конец диалогового окна для добавление медикамента -->
 
 
-    <!-- диалоговое окно для обновления данных о складе -->
+    <!-- диалоговое окно для обновления данных о медекаменте -->
     <q-dialog v-model="state.updateCard" persistent>
       <q-card>
         <q-card-section class="items-center">
 
           <!-- заголовки карточки -->
           <div class="row">
-            <q-avatar icon="warehouse" color="orange" text-color="white" />
-            <span class="q-ma-sm text-h5">Обновить данные склада</span>
+            <q-avatar icon="medication" color="orange" text-color="white" />
+            <span class="q-ma-sm text-h5">Обновить данные медикамента</span>
           </div>
             
-          <!-- инпуты для обновления данных склада -->
+          <!-- инпуты для обновления данных медикамента -->
           <div>
-            <q-input  type="text" label="Директор" v-model="state.update_warehouse_director" />
-            <q-input  type="text" label="Адрес" v-model="state.update_warehouse_address" />
-            <q-input type="text" label="Номер телефона" v-model=state.update_warehouse_phone />
+            <q-input type="text" label="Название" v-model="state.update_med_name" />
+            <q-input type="text" label="Категория" v-model="state.update_med_category" />
+            <q-input type="number" step="0.01" label="Доза" v-model=state.update_med_dosage />
+            <q-input type="number" step="0.01" label="Цена" min="0.00" max="10000.00" v-model=state.update_med_price />
+            <q-input type="date" label="Истечение срока годности" v-model=state.update_med_expiration_date />
+            <q-input type="date" label="Дата поступления" v-model=state.update_med_receipts />
+          </div>
+          <span class="q-ma-xl text-h6 center">Выберите поставщика</span>
+          <div class="column">
+            <q-radio v-for="s in state.supplier" :key="s.s_id" v-model="state.update_supplierID" :val="s.s_id" :label="s.s_name" />
           </div>
           
 
@@ -123,23 +136,25 @@
         <q-card-actions align="right">
           <q-btn flat label="Отмена" color="red" v-close-popup />
           <q-btn 
-            v-if="
-              state.update_warehouse_director.length > 0 &&
-              state.update_warehouse_address.length > 0 &&
-              state.update_warehouse_phone.length > 0
-            "
-            flat label="Обновить" color="orange" @click="updateWarehouse()" />
+            v-if="true"
+            flat label="Обновить" color="orange" @click="updateMed()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <!-- конец диалового окна для обновления данных о складе -->
+    <!-- конец диалового окна для обновления данных о медикаменте -->
 
   </q-page>
 </template>
 
 <script setup> 
 import axios from 'axios';
-import { onMounted, onUpdated, reactive } from 'vue';
+import { onMounted, onUpdated, reactive, inject } from 'vue';
+
+
+//берем функцию для получения всех поставщиков
+const { getSupplier } = inject('supplier');
+//берем функцию для получения всех медикаментов
+const { getMed } = inject('med');
 
 
 
@@ -147,116 +162,145 @@ import { onMounted, onUpdated, reactive } from 'vue';
 //сотояние страницы
 const state = reactive({
 
+//поставщики
+supplier: [],
 
-addCard: false, //параметр для отображение карты с добавлением склада
 
-updateCard: false, //параметр для отображения карты с обновлением параметров склада
+//айдишник чтобы добавить поставщика
+add_supplierID: null,
 
-// параметры для добавления нового склада
-add_warehouse_director: "",
-add_warehouse_address: "",
-add_warehouse_phone: "",
+//айдишник для обновления поставщика
+update_supplierID: null,
+
+addCard: false, //параметр для отображение карты с добавлением медикамента
+
+updateCard: false, //параметр для отображения карты с обновлением параметров медикаментов
+
+// параметры для добавления нового медикамента
+add_med_name: "",
+add_med_category: "",
+add_med_dosage: "",
+add_med_price: "",
+add_med_expiration_date: "",
+add_med_receipts: "",
 //
 
 
-//параметры для обнолвения нового склада
-update_warehouse_director: "",
-update_warehouse_address: "",
-update_warehouse_phone: "",
-update_w_id: "",
+//параметры для обнолвения медикамента
+update_med_name: "",
+update_med_category: "",
+update_med_dosage: "",
+update_med_price: "",
+update_med_expiration_date: "",
+update_med_receipts: "",
+update_med_id: "",
 //
 
-warehouse : [],
+medication : [],
 columns : [
 {
-  name: 'w_id',
+  name: 'med_id',
   required: true,
   label: 'Индекс',
   align: 'center',
-  field: row => row.w_id,
+  field: row => row.med_id,
   format: val => `${val}`,
   sortable: true
 },
-{ name: 'w_director', align: 'center', label: 'Директор', field: row => row.w_director, sortable: true },
-{ name: 'w_address', align: 'center', label: 'Адрес', field: row => row.w_address, sortable: true },
-{ name: 'w_phone_number', align: 'center', label: 'Номер телефона', field: row => row.w_phone_number, sortable: true },
+{ name: 'med_name', align: 'center', label: 'Название', field: row => row.med_name, sortable: true },
+{ name: 'med_category', align: 'center', label: 'Категория', field: row => row.med_category, sortable: true },
+{ name: 'med_dosage', align: 'center', label: 'Доза', field: row => row.med_dosage, sortable: true },
+{ name: 'med_price', align: 'center', label: 'Цена(руб.)', field: row => row.med_price, sortable: true },
+{ name: 'med_expiration_date', align: 'center', label: 'Истечение срока годности', field: row => row.med_expiration_date, sortable: true },
+{ name: 'med_receipts', align: 'center', label: 'Дата поступления', field: row => row.med_receipts, sortable: true },
+
+
+//кнопки для манипуляции с данными
 { name: 'info', label: 'Иформация', align: 'center'},
 { name: 'update', label: 'Изменение данных', align: 'center'},
-{ name: 'delete', label: 'Удаление склада', align: 'center', }
+{ name: 'delete', label: 'Удаление медикамента', align: 'center', }
 ],
 
 })
 
-// функция получения всех складов
-function getWarehouse(){
-axios.get(
-  "http://localhost:5000/warehouse"
-)
-.then(function(response){
-  state.warehouse = response.data.warehouse;
-}
-)
-}
-
-// функция для добавления склада
-function addWarehouse(){
+// функция для добавления медикамента
+function addMed(){
 axios.post(
-  "http://localhost:5000/warehouse",
+  "http://localhost:5000/medication",
   {
-    w_address: state.add_warehouse_address,
-    w_phone_number: state.add_warehouse_phone,
-    w_director: state.add_warehouse_director
+    med_name: state.add_med_name,
+    med_category: state.add_med_category,
+    med_dosage: state.add_med_dosage,
+    med_price: state.add_med_price,
+    med_expiration_date: state.add_med_expiration_date,
+    med_receipts: state.add_med_receipts,
+    supplierID: state.add_supplierID
   }
-).then(function(response){
-  getWarehouse();
+).then(async (response) =>{
+  state.medication = await getMed();
   state.addCard = false
 }
 
 );
 }
 
-// функция для удаления склада
-function deleteWarehouse(w_id){
+// функция для удаления медикамента
+function deleteMed(med_id){
 axios.delete(
-  `http://localhost:5000/warehouse/${w_id}`
-).then(() => {
-  getWarehouse();
+  `http://localhost:5000/medication/${med_id}`
+).then(async () => {
+  state.medication = await getMed();
 })
 }
 
-//функция для отображение карточки обновления данных о складе
-function showUpdateCard(w_director, w_address, w_phone_number, w_id){
-state.update_warehouse_director = w_director;
-state.update_warehouse_address = w_address;
-state.update_warehouse_phone = w_phone_number;
-state.update_w_id = w_id;
+//функция для отображение карточки обновления данных о медикаменте
+function showUpdateCard(
+  med_name, 
+  med_category, 
+  med_dosage, 
+  med_price,
+  med_expiration_date,
+  med_receipts,
+  supplierID,
+  med_id
+)
+{
+state.update_med_name = med_name;
+state.update_med_category = med_category;
+state.update_med_dosage = med_dosage;
+state.update_med_price = med_price;
+state.update_med_expiration_date = med_expiration_date;
+state.update_med_receipts = med_receipts;
+state.update_supplierID = supplierID;
+state.update_med_id = med_id;
 state.updateCard = true;
 }
 
-//функция для обновления данных о складе
-function updateWarehouse(){
+//функция для обновления данных о медикаменте
+function updateMed(){
 axios.put(
-  `http://localhost:5000/warehouse/${state.update_w_id}`,
+  `http://localhost:5000/medication/${state.update_med_id}`,
   {
-    w_id: state.update_w_id,
-    w_address: state.update_warehouse_address,
-    w_phone_number: state.update_warehouse_phone,
-    w_director: state.update_warehouse_director
+    med_id: state.update_med_id,
+    med_name: state.update_med_name,
+    med_category: state.update_med_category,
+    med_dosage: state.update_med_dosage,
+    med_price: state.update_med_price,
+    med_expiration_date: state.update_med_expiration_date,
+    med_receipts: state.update_med_receipts,
+    supplierID: state.update_supplierID
   }
-).then(() => {
-  getWarehouse();
+).then(async () => {
+  state.medication = await getMed();
   state.updateCard = false;
 })
 }
 
 
 //хук жизни mounted
-onMounted(() =>{
-  getWarehouse()
+onMounted(async () =>{
+  state.supplier = await getSupplier();
+  state.medication = await getMed();
 })
 
-//при хуке жизни update мы вызываем обновление складов
-onUpdated(() => {
-  getWarehouse()
-})
 </script>

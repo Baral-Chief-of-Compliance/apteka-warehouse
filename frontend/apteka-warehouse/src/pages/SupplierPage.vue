@@ -122,8 +122,9 @@
 
 <script setup> 
 import axios from 'axios';
-import { onMounted, onUpdated, reactive } from 'vue';
+import { onMounted, onUpdated, reactive, inject } from 'vue';
 
+const { getSupplier } = inject('supplier');
 
 
 
@@ -164,26 +165,15 @@ columns : [
 
 })
 
-// функция получения всех поставщиков
-function getSupplier(){
-axios.get(
-  "http://localhost:5000/supplier"
-)
-.then(function(response){
-  state.supplier = response.data.suppliers;
-}
-)
-}
-
 // функция для добавления поставщика
-function addSupplier(){
+function addSupplier() {
 axios.post(
   "http://localhost:5000/supplier",
   {
     s_name: state.add_supplier_name,
   }
-).then(function(response){
-  getSupplier();
+).then(async function(response){
+  state.supplier = await getSupplier();
   state.addCard = false;
 }
 
@@ -194,8 +184,8 @@ axios.post(
 function deleteSupplier(s_id){
 axios.delete(
   `http://localhost:5000/supplier/${s_id}`
-).then(() => {
-  getSupplier();
+).then(async() => {
+  state.supplier = await getSupplier();
 })
 }
 
@@ -214,20 +204,16 @@ axios.put(
     s_id: state.update_s_id,
     s_name: state.update_supplier_name
   }
-).then(() => {
-  getSupplier();
+).then(async () => {
+  state.supplier = await getSupplier();
   state.updateCard = false;
 })
 }
 
 
 //хук жизни mounted
-onMounted(() =>{
-  getSupplier()
+onMounted(async() =>{
+  state.supplier = await getSupplier();
 })
 
-//при хуке жизни update мы вызываем обновление поставщиков
-onUpdated(() => {
-  getSupplier()
-})
 </script>

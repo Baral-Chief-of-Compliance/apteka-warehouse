@@ -39,6 +39,10 @@
 <script setup>
 import axios from 'axios';
 import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
+
+//роутер
+const router = useRouter()
 
 
 // реактивное состояние страницы
@@ -69,6 +73,10 @@ function login(){
         
         // помещаем токен в локал сторадж для хранения
         localStorage.setItem("access_token", response.data.access_token)
+
+        router.push({name: 'Index'})
+
+
     })
     .catch(function (error) {
         console.log(error);

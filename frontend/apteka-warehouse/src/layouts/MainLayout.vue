@@ -16,6 +16,7 @@
         </q-toolbar-title>
 
         <div>ООО "Здоровье"</div>
+        <q-btn class="q-mx-xl"  color="red" icon="close" label="ВЫЙТИ" @click="exitFromApp()" />
       </q-toolbar>
     </q-header>
 
@@ -46,8 +47,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import { ref } from 'vue';
+import EssentialLink from 'components/EssentialLink.vue';
+import { useRouter } from 'vue-router';
+
 
 defineOptions({
   name: 'MainLayout'
@@ -96,5 +99,14 @@ const leftDrawerOpen = ref(false)
 
 function toggleLeftDrawer () {
   leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+
+const router = useRouter()
+
+// функция для выхода из приложения
+function exitFromApp(){
+  localStorage.removeItem("access_token");
+  router.push({name: "Login"})
 }
 </script>

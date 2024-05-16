@@ -277,6 +277,35 @@ def addWarehouse(warehouse:Warehouse) -> None:
         if conn is not None:
             conn.close()
 
+
+#получение ифнормации о складе по его id
+def getWarehouse(w_id: int) -> dict:
+    conn = None
+    cursor = None
+    result = {}
+
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''SELECT * FROM warahouse where w_id = %s''', (w_id,))
+        warehouse_info = cursor.fetchone()
+        result = {
+            'w_id': warehouse_info[0],
+            'w_address': warehouse_info[1],
+            'w_director': warehouse_info[2],
+            'w_phone_number': warehouse_info[3]
+        }
+        
+    except Exception as error:
+        print(error)
+
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+        return result
+
 #получение всех складов
 def allWarehouse() -> list:
     conn = None
@@ -417,7 +446,7 @@ def allMedication() -> list:
                 "med_name": m[1],
                 "med_category": m[2],
                 "med_dosage": m[3],
-                "med_price": m[4],
+                "med_price": float(m[4][1:]),
                 "med_expiration_date": m[5],
                 "med_receipts": m[6],
                 "supplierID": m[7]
@@ -472,6 +501,50 @@ def updateMedication(medication:Medication) -> None:
                            medication.med_expiration_date, medication.med_receipts,
                            medication.supplierID, medication.med_id
                            ))
+        conn.commit()
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+
+#модель медикаментов склада
+class MedicationWarehouse(BaseModel):
+    w_id : int
+    med_id : int
+
+#функция добавления медикаментов склада
+def addMedicationWarehouse(medicationWarehouse: MedicationWarehouse) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''INSERT INTO
+        medication_warehouse(warehouseid, medicationid) values (%s, %s)
+        ''', (medicationWarehouse.w_id, medicationWarehouse.med_id))
+        
+        conn.commit()
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+
+#функция удаление медикамента склада
+def deleteMedicationWarehouse(w_id: int, med_id: int) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''DELETE FROM medication_warehouse WHERE medicationid = %s and warehouseid = %s''', (med_id, w_id))
         conn.commit()
     except Exception as error:
         print(error)

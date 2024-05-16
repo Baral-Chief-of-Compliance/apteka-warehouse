@@ -137,6 +137,15 @@
 <script setup> 
 import axios from 'axios';
 import { onMounted, onUpdated, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+
+//роутер
+const router = useRouter()
+
+//возвращение на страницу с логином
+function returnToLigonPage(){
+  router.push({name: 'Login'})
+}
 
 
 
@@ -192,12 +201,17 @@ const state = reactive({
 // функция получения всех аптек
 function getPharmacy(){
   axios.get(
-    "http://localhost:5000/pharmacy"
+    "http://localhost:5000/pharmacy", {
+      headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+    }
   )
   .then(function(response){
     state.pharmacys = response.data.pharmacys;
   }
   )
+  .catch(function(error){
+    returnToLigonPage()
+  })
 }
 
 // функция для добавления аптеки

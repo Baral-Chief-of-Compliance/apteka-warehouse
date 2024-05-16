@@ -231,7 +231,7 @@ def add_pharmacy(pharmacy: db_tools.Pharmacy) -> str:
 
 #получение всех аптек
 @app.get("/pharmacy", tags=["Аптеки"])
-def get_all_pharmacy() -> dict:
+def get_all_pharmacy(current_user: User = Depends(get_current_active_user)) -> dict:
     return {
         "pharmacys" : db_tools.getAllPharmacy()
     }
@@ -282,6 +282,13 @@ def update_supplier(supplier:db_tools.Supplier) -> str:
 def add_warehouse(warehouse:db_tools.Warehouse) -> str:
     db_tools.addWarehouse(warehouse=warehouse)
     return f"warehouse on {warehouse.w_address} is added"
+
+
+@app.get('/warehouse/{w_id}', tags=["Склады"])
+def getInfoAboutWarehouse(w_id:int) -> dict:
+    return {
+        'warehouse_info': db_tools.getWarehouse(w_id)
+    }
 
 #получение всех складов
 @app.get("/warehouse", tags=["Склады"])
