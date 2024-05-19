@@ -136,11 +136,14 @@
 
 <script setup> 
 import axios from 'axios';
-import { onMounted, onUpdated, reactive } from 'vue';
+import { onMounted, onUpdated, reactive, inject } from 'vue';
 import { useRouter } from 'vue-router';
 
 //роутер
 const router = useRouter()
+
+//берем функцию для получения всех аптек
+const { getPharmacy } = inject('pharmacy');
 
 //возвращение на страницу с логином
 function returnToLigonPage(){
@@ -198,21 +201,6 @@ const state = reactive({
 
 })
 
-// функция получения всех аптек
-function getPharmacy(){
-  axios.get(
-    "http://localhost:5000/pharmacy", {
-      headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
-    }
-  )
-  .then(function(response){
-    state.pharmacys = response.data.pharmacys;
-  }
-  )
-  .catch(function(error){
-    returnToLigonPage()
-  })
-}
 
 // функция для добавления аптеки
 function addPharmacy(){
@@ -223,8 +211,8 @@ function addPharmacy(){
       ph_phone_number: state.add_pharmacy_phone,
       ph_name: state.add_pharmacy_name
     }
-  ).then(function(response){
-    getPharmacy();
+  ).then(async (response)=>{
+    state.pharmacys = await getPharmacy();
     state.addCard = false
   }
 
@@ -235,8 +223,8 @@ function addPharmacy(){
 function deletePharmacy(ph_id){
   axios.delete(
     `http://localhost:5000/pharmacy/${ph_id}`
-  ).then(() => {
-    getPharmacy();
+  ).then(async() => {
+    state.pharmacys = await getPharmacy();
   })
 }
 
@@ -259,20 +247,15 @@ function updatePharmacy(){
       ph_phone_number: state.update_pharmacy_phone,
       ph_name: state.update_pharmacy_name
     }
-  ).then(() => {
-    getPharmacy();
+  ).then(async() => {
+    state.pharmacys = await getPharmacy();
     state.updateCard = false;
   })
 }
 
 
 //хук жизни mounted
-onMounted(() =>{
-  getPharmacy()
-})
-
-//при хуке жизни update мы вызываем обновление аптек
-onUpdated(() => {
-  getPharmacy()
+onMounted(async() =>{
+  state.pharmacys = await getPharmacy();
 })
 </script>

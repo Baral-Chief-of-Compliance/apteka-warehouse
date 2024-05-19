@@ -305,6 +305,52 @@ def getWarehouse(w_id: int) -> dict:
         if conn is not None:
             conn.close()
         return result
+    
+
+#получение всех медикаментов со склада
+def getMedicationFromWareHouse(w_id: int) -> list:
+    conn = None
+    cursor = None
+    result = []
+
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''SELECT * from get_medication_from_warehouse(%s)''', (w_id,))
+        medication = cursor.fetchall()
+        print(medication)
+
+        for m in medication:
+            result.append({
+                "w_id": m[0],
+                "w_director": m[1],
+                "w_phone_number": m[2],
+                "w_address": m[3],
+                "warehouseid": m[4],
+                "medicationid": m[5],
+                "med_id": m[6],
+                "med_name": m[7],
+                "med_catagory": m[8],
+                "med_dosage": m[9],
+                "med_price": float(m[10][1:]),
+                "med_expiration_date": m[11],
+                "med_receipts": m[12],
+                "supplierid": m[13],
+                "s_id": m[14],
+                "s_name": m[15]
+            })
+
+    except Exception as error:
+        print(error)
+
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+        return result
+
+        
 
 #получение всех складов
 def allWarehouse() -> list:
@@ -449,7 +495,8 @@ def allMedication() -> list:
                 "med_price": float(m[4][1:]),
                 "med_expiration_date": m[5],
                 "med_receipts": m[6],
-                "supplierID": m[7]
+                "supplierID": m[7],
+                "quantity": 1
             })
     except Exception as error:
         print(error)
@@ -553,3 +600,208 @@ def deleteMedicationWarehouse(w_id: int, med_id: int) -> None:
             cursor.close()
         if conn is not None:
             conn.close()
+
+
+#модель заказа
+class Order(BaseModel):
+    ph_od_id : int or None = None
+    ph_od_date: datetime = datetime.today
+    ph_od_date_shipment: datetime or None = None
+    ph_od_status: str or None = 'Создан'
+    pharmacyid: int
+
+
+#добавить заказ
+def addOreder(order: Order) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''INSERT INTO pharmacy_order(ph_od_date, ph_od_status, pharmacyid) values (%s, %s, %s)''',
+                       (order.ph_od_date, order.ph_od_status, order.pharmacyid))
+        conn.commit()
+
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+#получить максимальный айди в таблице заказов
+def getOrderMaxId() -> int:
+    conn = None
+    cursor= None
+    result = 0
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''SELECT MAX(ph_od_id) FROM pharmacy_order''')
+        id = cursor.fetchone()
+        result = id[0]
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+        return result
+
+
+#изменение статуса заказа
+def updateOrderStatus(order: Order) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''UPDATE pharmacy_order SET ph_od_status = %s WHERE ph_od_id = %s''', 
+                       (order.ph_od_status, order.ph_od_id))
+        conn.commit()
+
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+
+#изменение установка даты отгрузки заказа
+def updateShipmentDate(order: Order) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''UPDATE pharmacy_order SET ph_od_date_shipment = %s WHERE ph_od_id = %s''', 
+                       (order.ph_od_date_shipment, order.ph_od_id))
+        conn.commit()
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+
+#отображение всех заказов
+def allOrder() -> list:
+    conn = None
+    cursor = None
+    result = []
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''SELECT * FROM getorders();''')
+        orders = cursor.fetchall()
+        
+        for o in orders:
+            result.append({
+                'ph_od_id': o[0],
+                'ph_od_date': o[1],
+                'ph_od_date_shipment': o[2],
+                'ph_od_status': o[3],
+                'ph_name': o[4],
+                'ph_address': o[5],
+                'ph_phone_number': o[6]
+            })
+
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+        return result  
+
+
+#удаление заказа
+def deleteOrder(ph_od_id: int) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''DELETE FROM pharmacy_order WHERE ph_od_id = %s''', (ph_od_id,))
+        conn.commit()
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()    
+    
+
+# модель для медикамента в заказ
+class medicationOrder(BaseModel):
+    med_id: int
+    ph_od_id: int
+    quantity: int
+
+
+#добавить медикаменты в заказ
+def addMedOrder(medicationOrder: medicationOrder) -> None:
+    conn = None
+    cursor = None
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''
+                       INSERT INTO medication_pharmacy_order(medicationid, pharmacy_orderid, med_ph_od_quantity) values (%s, %s, %s)''',
+                       (medicationOrder.med_id, medicationOrder.ph_od_id, medicationOrder.quantity)
+                       )
+        conn.commit()
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close() 
+
+
+#получить все медикаменты в заказе
+def getMedInOrder(ph_od_id: int) -> dict:
+    conn = None
+    cursor = None
+    result = {
+        'medications': [],
+        'amountPrice': 0
+    }
+    try:
+        conn = connectionDB()
+        cursor = conn.cursor()
+        cursor.execute('''SELECT * FROM get_med_in_order(%s)''', (ph_od_id,))
+        medications = cursor.fetchall()
+
+        
+
+        for m in medications:
+            result["medications"].append({
+                'med_name': m[0],
+                'med_catagory': m[1],
+                'med_dosage': m[2],
+                'med_price': float(m[3][1:]),
+                'med_expiration_date': m[4],
+                'med_receipts': m[5],
+                'med_quantity': m[6],
+                'med_amount_price': m[6] * float(m[3][1:])
+            })
+
+            result['amountPrice'] += m[6] * float(m[3][1:])
+    except Exception as error:
+        print(error)
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close() 
+        return result

@@ -12,10 +12,9 @@
         />
 
         <q-toolbar-title>
-          Административная панель
+          ООО "Здоровье"
         </q-toolbar-title>
 
-        <div>ООО "Здоровье"</div>
         <q-btn class="q-mx-xl"  color="red" icon="close" label="ВЫЙТИ" @click="exitFromApp()" />
       </q-toolbar>
     </q-header>

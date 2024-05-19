@@ -38,8 +38,20 @@ tags_metadata = [
         "description": "Операции связанные со складами."
     },
     {
+        "name": "Медикаменты на складе",
+        "description": "Операции связанные с медикаментами на складе."
+    },
+    {
         "name": "Медикаменты",
         "description": "Опреации связанные с медикаментами."
+    },
+    {
+        "name": "Заказы",
+        "description": "Опреации связанные с заказами."
+    },
+    {
+        "name": "Медикаменты в заказе",
+        "description": "Опреации связанные с медикаментами в заказе."
     }
 ]
 
@@ -287,7 +299,8 @@ def add_warehouse(warehouse:db_tools.Warehouse) -> str:
 @app.get('/warehouse/{w_id}', tags=["Склады"])
 def getInfoAboutWarehouse(w_id:int) -> dict:
     return {
-        'warehouse_info': db_tools.getWarehouse(w_id)
+        'warehouse_info': db_tools.getWarehouse(w_id),
+        'medications':db_tools.getMedicationFromWareHouse(w_id),
     }
 
 #получение всех складов
@@ -335,3 +348,63 @@ def delete_medication(med_id : int) -> str:
 def update_medication(medication:db_tools.Medication) -> str:
     db_tools.updateMedication(medication)
     return f"medication with med_id = {medication.med_id} is updated"
+
+#добавление медикамента на склад
+@app.post("/medication-warehouse", tags=["Медикаменты на складе"])
+def add_medication_to_warehouse(medicationWarehouse: db_tools.MedicationWarehouse) -> str:
+    db_tools.addMedicationWarehouse(medicationWarehouse)
+    return f"medication {medicationWarehouse.med_id} on warehouse with {medicationWarehouse}"
+
+#удаление медикамента на складе
+@app.delete("/medication-warehouse/{w_id}-{med_id}", tags=["Медикаменты на складе"])
+def delete_medication_from_warehouse(w_id: int, med_id: int) -> str:
+    db_tools.deleteMedicationWarehouse(w_id=w_id, med_id=med_id)
+    return f"medication delete {med_id} from warehouse {w_id}"
+
+
+#получение всех заказов
+@app.get("/orders", tags=["Заказы"])
+def get_all_orders() -> dict:
+    return {
+        "orders": db_tools.allOrder()
+    }
+
+#добавление заказа
+@app.post("/orders", tags=["Заказы"])
+def add_order(order: db_tools.Order) -> dict:
+    db_tools.addOreder(order)
+    return {
+        "ph_od_id": db_tools.getOrderMaxId()
+    }
+
+#удаление заказа
+@app.delete("/orders/{ph_od_id}", tags=["Заказы"])
+def delete_order(ph_od_id: int) -> str:
+    db_tools.deleteOrder(ph_od_id)
+    return f"order with id {ph_od_id} is deleted"
+
+#получение медикаментов в заказе
+@app.get("/orders/{ph_od_id}/details", tags=["Заказы"])
+def getMedInOrder(ph_od_id: int) -> dict:
+    return db_tools.getMedInOrder(ph_od_id)
+
+
+#обновление статуса заказ
+@app.put("/orders/status", tags=["Заказы"])
+def update_status(order: db_tools.Order) -> str:
+    db_tools.updateOrderStatus(order)
+    return f"order {order.ph_od_id} status is {order.ph_od_status}"
+
+
+#обновление даты отгрузки
+@app.put("/orders/shipment-date", tags=["Заказы"])
+def update_shipment_date(order: db_tools.Order) -> str:
+    db_tools.updateShipmentDate(order)
+    return f"order {order.ph_od_id} shipment date is {order.ph_od_date_shipment}"
+
+
+#добавление медикамента в заказ
+@app.post('/medication-order', tags=['Медикаменты в заказе'])
+def add_medication_to_order(medication_order: db_tools.medicationOrder) -> str:
+    db_tools.addMedOrder(medication_order)
+    return f"med {medication_order.med_id} in quantity {medication_order.quantity} is add in order {medication_order.ph_od_id}"
