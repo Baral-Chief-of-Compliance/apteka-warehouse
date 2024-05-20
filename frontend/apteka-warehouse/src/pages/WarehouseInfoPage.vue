@@ -25,7 +25,7 @@
           <!-- изменяем отображение для колонки удаление данных -->
           <template v-slot:body-cell-delete="props">
             <q-td :props="props">
-              <q-btn color="red" icon="delete" @click="deleteMed(props.row.med_id)"></q-btn>
+              <q-btn v-if="checkRightsAdminManagerPhManager()" color="red" icon="delete" @click="deleteMed(props.row.med_id)"></q-btn>
             </q-td>
           </template>
         
@@ -38,7 +38,7 @@
 
       <!-- кнопка чтобы добавить склад -->
       <div class="q-mt-xl column">
-        <q-btn color="green" icon="add" label="Добавить медикаментов на склад" @click="state.addCard=true, state.selected_med = []" />
+        <q-btn v-if="checkRightsAdminManagerPhManager()" color="green" icon="add" label="Добавить медикаментов на склад" @click="state.addCard=true, state.selected_med = []" />
       </div>
 
 
@@ -75,6 +75,12 @@ import { onMounted, reactive, inject } from 'vue';
 
 //берем функцию для получения всех медикаментов
 const { getMed } = inject('med');
+
+//функция для проверки прва для админа и манагера склада
+const { checkRightsAdminManager } = inject('role');
+
+//функция для проверки прва для админа и манагера склада и манагера аптеки
+const {checkRightsAdminManagerPhManager} = inject('role');
 
 //роутер
 const router = useRouter();
@@ -123,7 +129,7 @@ const state = reactive({
 //получить информацию о складе по его id
 function getInfoWarehouse(){
   axios.get(
-    `http://localhost:5000/warehouse/${route.params.w_id}`
+    `https://zdorovie.space/api/v1/warehouse/${route.params.w_id}`
   )
   .then((response)=>{
     state.w_id = response.data.warehouse_info.w_id;
@@ -139,7 +145,7 @@ function getInfoWarehouse(){
 function addMedicationToWareHouse(){
   for (let index = 0; index < state.selected_med.length; index++) {
       axios.post(
-        "http://localhost:5000/medication-warehouse",{
+        "https://zdorovie.space/api/v1/medication-warehouse",{
           w_id : state.w_id,
           med_id: state.selected_med[index]
         }
@@ -153,7 +159,7 @@ function addMedicationToWareHouse(){
 //функция удаление медикамента со склада
 function deleteMed(med_id){
   axios.delete(
-    `http://localhost:5000/medication-warehouse/${state.w_id}-${med_id}`
+    `https://zdorovie.space/api/v1/medication-warehouse/${state.w_id}-${med_id}`
   ).then(async()=>{
     getInfoWarehouse();
   }

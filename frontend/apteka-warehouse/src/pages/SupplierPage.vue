@@ -35,7 +35,7 @@
       <template v-slot:body-cell-update="props">
 
         <q-td :props="props">
-          <q-btn color="orange" icon="mode_edit" @click="showUpdateCard(
+          <q-btn v-if="checkRightsAdminManager()" color="orange" icon="mode_edit" @click="showUpdateCard(
             props.row.s_name,
             props.row.s_id
             )"></q-btn>
@@ -45,7 +45,7 @@
       <!-- изменяем отображение для колонки удаление данных -->
       <template v-slot:body-cell-delete="props">
         <q-td :props="props">
-          <q-btn color="red" icon="delete" @click="deleteSupplier(props.row.s_id)"></q-btn>
+          <q-btn v-if="checkRightsAdminManager()" color="red" icon="delete" @click="deleteSupplier(props.row.s_id)"></q-btn>
         </q-td>
       </template>
     
@@ -54,7 +54,7 @@
 
       <!-- кнопка для добавлени поставщика -->
       <div class="q-mt-xl column">
-        <q-btn  color="green" icon="add" label="Добавить поставщика" @click="state.addCard = true" />
+        <q-btn v-if="checkRightsAdminManager()"  color="green" icon="add" label="Добавить поставщика" @click="state.addCard = true" />
       </div>
     </div>
 
@@ -126,7 +126,8 @@ import { onMounted, onUpdated, reactive, inject } from 'vue';
 
 const { getSupplier } = inject('supplier');
 
-
+//функция для проверки прва для админа и манагера склада
+const { checkRightsAdminManager } = inject('role');
 
 //сотояние страницы
 const state = reactive({
@@ -158,7 +159,7 @@ columns : [
   sortable: true
 },
 { name: 's_name', align: 'center', label: 'Имя поставщика', field: row => row.s_name, sortable: true },
-{ name: 'info', label: 'Иформация', align: 'center'},
+// { name: 'info', label: 'Иформация', align: 'center'},
 { name: 'update', label: 'Изменение данных', align: 'center'},
 { name: 'delete', label: 'Удаление склада', align: 'center', }
 ],
@@ -168,7 +169,7 @@ columns : [
 // функция для добавления поставщика
 function addSupplier() {
 axios.post(
-  "http://localhost:5000/supplier",
+  "https://zdorovie.space/api/v1/supplier",
   {
     s_name: state.add_supplier_name,
   }
@@ -183,7 +184,7 @@ axios.post(
 // функция для удаления поставщика
 function deleteSupplier(s_id){
 axios.delete(
-  `http://localhost:5000/supplier/${s_id}`
+  `https://zdorovie.space/api/v1/supplier/${s_id}`
 ).then(async() => {
   state.supplier = await getSupplier();
 })
@@ -199,7 +200,7 @@ state.updateCard = true;
 //функция для обновления данных о поставщике
 function updateSupplier(){
 axios.put(
-  `http://localhost:5000/supplier/${state.update_s_id}`,
+  `https://zdorovie.space/api/v1/supplier/${state.update_s_id}`,
   {
     s_id: state.update_s_id,
     s_name: state.update_supplier_name

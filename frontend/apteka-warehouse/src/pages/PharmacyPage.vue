@@ -35,7 +35,7 @@
         <template v-slot:body-cell-update="props">
 
           <q-td :props="props">
-            <q-btn color="orange" icon="mode_edit" @click="showUpdateCard(
+            <q-btn v-if="checkRightsAdminManagerPhManager()" color="orange" icon="mode_edit" @click="showUpdateCard(
               props.row.ph_name,
               props.row.ph_address,
               props.row.ph_phone_number,
@@ -47,7 +47,7 @@
         <!-- изменяем отображение для колонки удаление данных -->
         <template v-slot:body-cell-delete="props">
           <q-td :props="props">
-            <q-btn color="red" icon="delete" @click="deletePharmacy(props.row.ph_id)"></q-btn>
+            <q-btn v-if="checkRightsAdminManagerPhManager()" color="red" icon="delete" @click="deletePharmacy(props.row.ph_id)"></q-btn>
           </q-td>
         </template>
       
@@ -56,7 +56,7 @@
 
         <!-- кнопка для добавлени аптеки -->
         <div class="q-mt-xl column">
-          <q-btn  color="green" icon="add" label="Добавить аптеку" @click="state.addCard = true" />
+          <q-btn v-if="checkRightsAdminManagerPhManager()" color="green" icon="add" label="Добавить аптеку" @click="state.addCard = true" />
         </div>
       </div>
 
@@ -145,6 +145,13 @@ const router = useRouter()
 //берем функцию для получения всех аптек
 const { getPharmacy } = inject('pharmacy');
 
+
+//функция для проверки прва для админа и манагера склада
+const { checkRightsAdminManager } = inject('role');
+
+//функция для проверки прва для админа и манагера склада и манагера аптеки
+const {checkRightsAdminManagerPhManager} = inject('role');
+
 //возвращение на страницу с логином
 function returnToLigonPage(){
   router.push({name: 'Login'})
@@ -189,7 +196,7 @@ const state = reactive({
   { name: 'ph_name', align: 'center', label: 'Наименование', field: row => row.ph_name, sortable: true },
   { name: 'ph_address', align: 'center', label: 'Адрес', field: row => row.ph_address, sortable: true },
   { name: 'ph_phone_number', align: 'center', label: 'Номер телефона', field: row => row.ph_phone_number, sortable: true },
-  { name: 'info', label: 'Иформация', align: 'center'},
+  // { name: 'info', label: 'Иформация', align: 'center'},
   { name: 'update', label: 'Изменение данных', align: 'center'},
   { name: 'delete', label: 'Удаление аптеки', align: 'center', }
   // { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
@@ -205,7 +212,7 @@ const state = reactive({
 // функция для добавления аптеки
 function addPharmacy(){
   axios.post(
-    "http://localhost:5000/pharmacy",
+    "https://zdorovie.space/api/v1/pharmacy",
     {
       ph_address: state.add_pharmacy_address,
       ph_phone_number: state.add_pharmacy_phone,
@@ -222,7 +229,7 @@ function addPharmacy(){
 // функция для удаления аптеки
 function deletePharmacy(ph_id){
   axios.delete(
-    `http://localhost:5000/pharmacy/${ph_id}`
+    `https://zdorovie.space/api/v1/pharmacy/${ph_id}`
   ).then(async() => {
     state.pharmacys = await getPharmacy();
   })
@@ -240,7 +247,7 @@ function showUpdateCard(ph_name, ph_address, ph_phone_number, ph_id){
 //функция для обновления данных об аптеки
 function updatePharmacy(){
   axios.put(
-    `http://localhost:5000/pharmacy/${state.update_ph_id}`,
+    `https://zdorovie.space/api/v1/pharmacy/${state.update_ph_id}`,
     {
       ph_id: state.update_ph_id,
       ph_address: state.update_pharmacy_address,

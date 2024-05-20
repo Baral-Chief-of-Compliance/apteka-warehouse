@@ -57,7 +57,6 @@ tags_metadata = [
 
 
 load_dotenv()
-print(os.getenv("SECRET_KEY"), [os.getenv("ALGORITHM")])
 
 fake_db = {
     
@@ -68,8 +67,48 @@ fake_db = {
         "role": "test_role",
         "hashed_password": "$2b$12$Zl0xzFl/Cjen1GKx1VilWOTV6hf1Gc9UsBhhZ5bsZqSoQdJOEi0om",
         "disabled": False
-    }
+    },
+
+
+    "admin":{
+        "username": "admin",
+        "full_name": "admin",
+        "email": "emailadmin",
+        "role": "admin",
+        "hashed_password": "$2b$12$UKZBy4PmkMf7f4ots6XbeO7zl9HUxV6Y6AUyimgcjybdDiXkdSszy",
+        "disabled": False
+    },
+
+    "warehouse_manager":{
+        "username": "warehouse_manager",
+        "full_name": "warehouse_manager",
+        "email": "warehouse_manager",
+        "role": "руководитель склада",
+        "hashed_password": "$2b$12$0AXPOfMXPRo1fV.AYfc06OP83pV0x0PhdAEOEYlnbT/9p0jQKS0cG",
+        "disabled": False
+    },
+    "ph_manager":{
+        "username": "ph_manager",
+        "full_name": "ph_manager",
+        "email": "ph_manager",
+        "role": "директор аптечного склада",
+        "hashed_password": "$2b$12$qx8DiHxiK4LNu/nv6QGccOw8a9sJBRZ6JMuHVz6Oilz3SJV9OMsTC",
+        "disabled": False
+    },
+
+    "worker":{
+        "username": "worker",
+        "full_name": "worker",
+        "email": "worker",
+        "role": "работник",
+        "hashed_password": "$2b$12$kXGMlZ3Gfd8AzQKRY7E1VO.AJLRrSMrwx1/zSZM.mzaY3ulsbOgg.",
+        "disabled": False
+    },
+
+    
 }
+
+
 
 class Token(BaseModel):
     access_token: str
@@ -194,6 +233,12 @@ async def get_current_active_user(current_user: UserInDB = Depends(get_current_u
     return current_user
 
 
+print(get_password_hash("admin_pwd"))
+print(get_password_hash("warehouse_manager_pwd"))
+print(get_password_hash("ph_manager_pwd"))
+print(get_password_hash("worker_pwd"))
+
+
 #token root
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -216,7 +261,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
 
 @app.get("/users/me/", response_model=User)

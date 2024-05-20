@@ -20,7 +20,7 @@ function returnToLigonPage(){
 // функция получения всех поставщиков
 function getSupplier(){
   return axios.get(
-    "http://localhost:5000/supplier"
+    "https://zdorovie.space/api/v1/supplier"
   )
   .then((response) => {
     return response.data.suppliers;
@@ -32,7 +32,7 @@ function getSupplier(){
 // функция получения всех медикаментов
 function getMed(){
   return axios.get(
-    "http://localhost:5000/medication"
+    "https://zdorovie.space/api/v1/medication"
   )
   .then((response) =>{
     return response.data.medication;
@@ -45,7 +45,7 @@ function getMed(){
 //функция для получения всех аптек
 function getPharmacy(){
   return axios.get(
-    "http://localhost:5000/pharmacy", {
+    "https://zdorovie.space/api/v1/pharmacy", {
       headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
     }
   )
@@ -56,6 +56,23 @@ function getPharmacy(){
     returnToLigonPage()
   })
 }
+
+//функция для получение роли пользователя
+function getRole(){
+  return localStorage.getItem('role')
+}
+
+//функция для проверки прав админа и манагера
+function checkRightsAdminManager(){
+  return getRole() === 'admin' | getRole() === 'руководитель склада'
+}
+
+//функция для проверки прав админа, манагера и манагер аптеки
+function checkRightsAdminManagerPhManager(){
+  return getRole() === 'admin' | getRole() === 'руководитель склада' | getRole() === 'директор аптечного склада'
+}
+
+
 
 provide('supplier', {
   getSupplier
@@ -68,6 +85,13 @@ provide('med', {
 provide('pharmacy', {
   getPharmacy
 });
+
+provide('role', {
+  getRole,
+  checkRightsAdminManager,
+  checkRightsAdminManagerPhManager
+});
+
 
 defineOptions({
   name: 'App'

@@ -26,7 +26,7 @@
       <!-- Изменяем отображение для колонки информации о медикаменте -->
       <template v-slot:body-cell-info="props">
         <q-td :props="props">
-          <q-btn color="primary" icon="info"></q-btn>
+          <q-btn  color="primary" icon="info"></q-btn>
         </q-td>
       </template>
 
@@ -35,7 +35,7 @@
       <template v-slot:body-cell-update="props">
 
         <q-td :props="props">
-          <q-btn color="orange" icon="mode_edit" @click="showUpdateCard(
+          <q-btn v-if="checkRightsAdminManager()" color="orange" icon="mode_edit" @click="showUpdateCard(
             props.row.med_name,
             props.row.med_category,
             props.row.med_dosage,
@@ -51,7 +51,7 @@
       <!-- изменяем отображение для колонки удаление данных -->
       <template v-slot:body-cell-delete="props">
         <q-td :props="props">
-          <q-btn color="red" icon="delete" @click="deleteMed(props.row.med_id)"></q-btn>
+          <q-btn v-if="checkRightsAdminManager()" color="red" icon="delete" @click="deleteMed(props.row.med_id)"></q-btn>
         </q-td>
       </template>
     
@@ -59,7 +59,7 @@
 
 
       <!-- кнопка для добавлени медикаментов -->
-      <div class="q-mt-xl column">
+      <div v-if="checkRightsAdminManager()" class="q-mt-xl column">
         <q-btn  color="green" icon="add" label="Добавить медикамент" @click="state.addCard = true" />
       </div>
     </div>
@@ -156,6 +156,12 @@ const { getSupplier } = inject('supplier');
 //берем функцию для получения всех медикаментов
 const { getMed } = inject('med');
 
+//функция для получения роли пользователя
+const { getRole } = inject('role');
+
+//функция для проверки прва для админа и манагера склада
+const { checkRightsAdminManager } = inject('role');
+
 
 
 
@@ -216,7 +222,7 @@ columns : [
 
 
 //кнопки для манипуляции с данными
-{ name: 'info', label: 'Иформация', align: 'center'},
+// { name: 'info', label: 'Иформация', align: 'center'},
 { name: 'update', label: 'Изменение данных', align: 'center'},
 { name: 'delete', label: 'Удаление медикамента', align: 'center', }
 ],
@@ -226,7 +232,7 @@ columns : [
 // функция для добавления медикамента
 function addMed(){
 axios.post(
-  "http://localhost:5000/medication",
+  "https://zdorovie.space/api/v1/medication",
   {
     med_name: state.add_med_name,
     med_category: state.add_med_category,
@@ -247,7 +253,7 @@ axios.post(
 // функция для удаления медикамента
 function deleteMed(med_id){
 axios.delete(
-  `http://localhost:5000/medication/${med_id}`
+  `https://zdorovie.space/api/v1/medication/${med_id}`
 ).then(async () => {
   state.medication = await getMed();
 })
@@ -279,7 +285,7 @@ state.updateCard = true;
 //функция для обновления данных о медикаменте
 function updateMed(){
 axios.put(
-  `http://localhost:5000/medication/${state.update_med_id}`,
+  `https://zdorovie.space/api/v1/medication/${state.update_med_id}`,
   {
     med_id: state.update_med_id,
     med_name: state.update_med_name,

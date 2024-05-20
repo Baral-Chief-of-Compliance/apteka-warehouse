@@ -15,3 +15,24 @@ services:
 
     volumes:
       - ./database/data:/var/lib/postgresql/data
+
+
+  backend:
+    build: './backend'
+    restart: always
+    volumes: 
+      - ./backend/src/:/home/app
+    ports:
+      - '8000:8000'
+
+  nginx:
+    build: './nginx'
+    restart: always
+    ports: 
+      - '80:80'
+
+    volumes:
+     - ./frontend/apteka-warehouse/dist/spa:/home/app/frontend
+
+    depends_on:
+      - backend

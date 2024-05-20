@@ -35,7 +35,7 @@
       <template v-slot:body-cell-update="props">
 
         <q-td :props="props">
-          <q-btn color="orange" icon="mode_edit" @click="showUpdateCard(
+          <q-btn v-if="checkRightsAdminManagerPhManager()" color="orange" icon="mode_edit" @click="showUpdateCard(
             props.row.w_director,
             props.row.w_address,
             props.row.w_phone_number,
@@ -47,7 +47,7 @@
       <!-- изменяем отображение для колонки удаление данных -->
       <template v-slot:body-cell-delete="props">
         <q-td :props="props">
-          <q-btn color="red" icon="delete" @click="deleteWarehouse(props.row.w_id)"></q-btn>
+          <q-btn v-if="checkRightsAdminManagerPhManager()" color="red" icon="delete" @click="deleteWarehouse(props.row.w_id)"></q-btn>
         </q-td>
       </template>
     
@@ -56,7 +56,7 @@
 
       <!-- кнопка для добавлени склада -->
       <div class="q-mt-xl column">
-        <q-btn  color="green" icon="add" label="Добавить склад" @click="state.addCard = true" />
+        <q-btn v-if="checkRightsAdminManagerPhManager()"  color="green" icon="add" label="Добавить склад" @click="state.addCard = true" />
       </div>
     </div>
 
@@ -136,13 +136,18 @@
 
 <script setup> 
 import axios from 'axios';
-import { onMounted, onUpdated, reactive } from 'vue';
+import { onMounted, onUpdated, reactive, inject } from 'vue';
 import { useRouter } from 'vue-router';
 
 
 //роутер
 const router = useRouter();
 
+//функция для проверки прва для админа и манагера склада
+const { checkRightsAdminManager } = inject('role');
+
+//функция для проверки прва для админа и манагера склада и манагера аптеки
+const {checkRightsAdminManagerPhManager} = inject('role');
 
 //сотояние страницы
 const state = reactive({
@@ -190,7 +195,7 @@ columns : [
 // функция получения всех складов
 function getWarehouse(){
 axios.get(
-  "http://localhost:5000/warehouse"
+  "https://zdorovie.space/api/v1/warehouse"
 )
 .then(function(response){
   state.warehouse = response.data.warehouse;
@@ -201,7 +206,7 @@ axios.get(
 // функция для добавления склада
 function addWarehouse(){
 axios.post(
-  "http://localhost:5000/warehouse",
+  "https://zdorovie.space/api/v1/warehouse",
   {
     w_address: state.add_warehouse_address,
     w_phone_number: state.add_warehouse_phone,
@@ -218,7 +223,7 @@ axios.post(
 // функция для удаления склада
 function deleteWarehouse(w_id){
 axios.delete(
-  `http://localhost:5000/warehouse/${w_id}`
+  `https://zdorovie.space/api/v1/warehouse/${w_id}`
 ).then(() => {
   getWarehouse();
 })
@@ -236,7 +241,7 @@ state.updateCard = true;
 //функция для обновления данных о складе
 function updateWarehouse(){
 axios.put(
-  `http://localhost:5000/warehouse/${state.update_w_id}`,
+  `https://zdorovie.space/api/v1/warehouse/${state.update_w_id}`,
   {
     w_id: state.update_w_id,
     w_address: state.update_warehouse_address,

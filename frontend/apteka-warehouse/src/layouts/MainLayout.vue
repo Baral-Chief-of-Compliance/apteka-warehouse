@@ -14,7 +14,7 @@
         <q-toolbar-title>
           ООО "Здоровье"
         </q-toolbar-title>
-
+        <div>{{ getUserName() }}|{{ getUserRole() }}</div>
         <q-btn class="q-mx-xl"  color="red" icon="close" label="ВЫЙТИ" @click="exitFromApp()" />
       </q-toolbar>
     </q-header>
@@ -69,7 +69,7 @@ const linksList = [
     link: 'Pharmacy'
   },
   {
-    title: 'Постащики',
+    title: 'Поставщики',
     caption: 'просмотр, добавление, удаление',
     icon: 'chat',
     link: 'Supplier'
@@ -86,13 +86,24 @@ const linksList = [
     icon: 'circle',
     link: 'Order'
   },
-  {
-    title: 'Пользователи',
-    caption: 'просмотр, добавление, удаление',
-    icon: 'person',
-    link: 'Users'
-  }
+  // {
+  //   title: 'Пользователи',
+  //   caption: 'просмотр, добавление, удаление',
+  //   icon: 'person',
+  //   link: 'Users'
+  // }
 ]
+
+
+//получить имя пользовает
+function getUserName(){
+  return localStorage.getItem('username');
+}
+
+//получить роль пользователя
+function getUserRole(){
+  return localStorage.getItem('role');
+}
 
 const leftDrawerOpen = ref(false)
 
@@ -106,6 +117,8 @@ const router = useRouter()
 // функция для выхода из приложения
 function exitFromApp(){
   localStorage.removeItem("access_token");
+  localStorage.removeItem('username');
+  localStorage.removeItem('role');
   router.push({name: "Login"})
 }
 </script>

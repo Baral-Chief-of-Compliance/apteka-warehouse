@@ -17,21 +17,21 @@
           <!-- кнопка удаление заказа -->
           <template v-slot:body-cell-delete="props">
             <q-td :props="props">
-              <q-btn color="red" icon="delete" @click="deleteOrder(props.row.ph_od_id)"></q-btn>
+              <q-btn v-if="checkRightsAdminManagerPhManager()" color="red" icon="delete" @click="deleteOrder(props.row.ph_od_id)"></q-btn>
             </q-td>
           </template>
 
           <!-- кнопка установка статуса заказа -->
           <template v-slot:body-cell-updateStatus="props">
             <q-td :props="props">
-              <q-btn color="orange" icon="toc" @click="state.updateStatusCard = openCard(props.row.ph_od_id)"></q-btn>
+              <q-btn v-if="checkRightsAdminManagerPhManager()" color="orange" icon="toc" @click="state.updateStatusCard = openCard(props.row.ph_od_id)"></q-btn>
             </q-td>
           </template>
 
           <!-- кнопка установка даты отгрузки -->
-          <template v-slot:body-cell-updateDate="props">
+          <template  v-slot:body-cell-updateDate="props">
             <q-td :props="props">
-              <q-btn color="orange" icon="schedule" @click="state.updateDateCard = openCard(props.row.ph_od_id)"></q-btn>
+              <q-btn v-if="checkRightsAdminManagerPhManager()" color="orange" icon="schedule" @click="state.updateDateCard = openCard(props.row.ph_od_id)"></q-btn>
             </q-td>
           </template>
 
@@ -47,13 +47,13 @@
       </div>
 
       <!-- кнопка для добавления заказа -->
-      <div class="column">
+      <div v-if="checkRightsAdminManagerPhManager()" class="column">
         <q-btn color="green" icon="add" label="Добавить заказ" @click="state.addCard = true" />
       </div>
 
       <!-- диалоговое окно для добавления заказа -->
       <q-dialog v-model="state.addCard" persistent>
-        <q-card>
+        <q-card class="col-8">
           <q-card-section class="column">
 
             <!-- заголовки карточки -->
@@ -67,7 +67,7 @@
             <div>
               <span class="q-ma-xl text-h6">ШАГ 1: Выбрать аптеку для заказа</span>
 
-              <div class="column ">
+              <div class="column">
                 <q-radio class="q-my-md" v-for="ph in state.pharmacy" :key="ph.ph_id" :val="ph.ph_id" v-model="state.selectPharmacy">
                     <q-card class="" style="width: 350px">
                       <q-card-section>
@@ -234,6 +234,12 @@ const { getPharmacy } = inject('pharmacy');
 //берем функцию для получения всех медикаментов
 const { getMed } = inject('med');
 
+//функция для проверки прва для админа и манагера склада
+const { checkRightsAdminManager } = inject('role');
+
+//функция для проверки прва для админа и манагера склада и манагера аптеки
+const {checkRightsAdminManagerPhManager} = inject('role');
+
 
 const state = reactive({
 
@@ -310,7 +316,7 @@ function getMedPrice(quantity, price){
 //функция для добавление заказа
 function addOrder(){
   axios.post(
-    'http://localhost:5000/orders', {
+    'https://zdorovie.space/api/v1/orders', {
       ph_od_date: "2024-05-19T16:55:09.690Z",
       ph_od_date_shipment: "2024-05-19T16:55:09.690Z",
       ph_od_status: "Создан",
@@ -321,7 +327,7 @@ function addOrder(){
 
     for (let index = 0; index < state.selected_med.length; index++) {
       axios.post(
-        'http://localhost:5000/medication-order',
+        'https://zdorovie.space/api/v1/medication-order',
         {
           med_id: state.selected_med[index]['med_id'],
           ph_od_id: state.orderId,
@@ -341,7 +347,7 @@ function addOrder(){
 
 // функция для получения всех заказов
 function getAllOrders(){
-  axios.get('http://localhost:5000/orders')
+  axios.get('https://zdorovie.space/api/v1/orders')
   .then((res)=>{
     state.orders = res.data.orders;
   })
@@ -350,7 +356,7 @@ function getAllOrders(){
 
 //функция удаление заказа
 function deleteOrder(ph_od_id){
-  axios.delete(`http://localhost:5000/orders/${ph_od_id}`)
+  axios.delete(`https://zdorovie.space/api/v1/orders/${ph_od_id}`)
   .then((res)=>{
     getAllOrders();
   })
@@ -358,7 +364,7 @@ function deleteOrder(ph_od_id){
 
 //функция получения медикаментов в заказе
 function getMedicationInOrder(ph_od_id){
-  axios.get(`http://localhost:5000/orders/${ph_od_id}/details`)
+  axios.get(`https://zdorovie.space/api/v1/orders/${ph_od_id}/details`)
   .then((res)=>{
     state.amountPrice = res.data.amountPrice;
     state.medicationsInOrder = res.data.medications;
@@ -368,7 +374,7 @@ function getMedicationInOrder(ph_od_id){
 
 //функция для обновления даты заказов
 function updateDateShipment(){
-  axios.put(`http://localhost:5000/orders/shipment-date`, {
+  axios.put(`https://zdorovie.space/api/v1/orders/shipment-date`, {
     ph_od_id: state.selectedOrderId,
     ph_od_date: "2024-05-19T17:55:23.906Z",
     ph_od_date_shipment: state.dateShipment,
@@ -383,7 +389,7 @@ function updateDateShipment(){
 
 //функция для обновления статуса заказов
 function updateStatus(){
-  axios.put(`http://localhost:5000/orders/status`, {
+  axios.put(`https://zdorovie.space/api/v1/orders/status`, {
     ph_od_id: state.selectedOrderId,
     ph_od_date: "2024-05-19T17:55:23.906Z",
     ph_od_date_shipment: "2024-05-19T17:55:23.906Z",

@@ -63,7 +63,7 @@ const config = {
 
 // функция для входа в приложение
 function login(){
-    axios.post("http://localhost:5000/token",{
+    axios.post("https://zdorovie.space/api/v1/token",{
         username: state.login,
         password: state.pwd
     }, config)
@@ -74,7 +74,16 @@ function login(){
         // помещаем токен в локал сторадж для хранения
         localStorage.setItem("access_token", response.data.access_token)
 
-        router.push({name: 'Index'})
+        axios.get("https://zdorovie.space/api/v1/users/me/",
+            {
+            headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+            }
+        ).then((res)=>{
+            localStorage.setItem('username', res.data.username);
+            localStorage.setItem('role', res.data.role);
+        })
+
+        router.push({name: 'Order'})
 
 
     })
