@@ -129,7 +129,9 @@ const state = reactive({
 //получить информацию о складе по его id
 function getInfoWarehouse(){
   axios.get(
-    `https://zdorovie.space/api/v1/warehouse/${route.params.w_id}`
+    `https://zdorovie.space/api/v1/warehouse/${route.params.w_id}`, {
+      headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+    }
   )
   .then((response)=>{
     state.w_id = response.data.warehouse_info.w_id;
@@ -139,6 +141,9 @@ function getInfoWarehouse(){
     state.medication = response.data.medications
   }
   )
+  .catch(function(error){
+    returnToLigonPage()
+  })
 }
 
 //функция добавление медикамента на склад

@@ -347,9 +347,14 @@ function addOrder(){
 
 // функция для получения всех заказов
 function getAllOrders(){
-  axios.get('https://zdorovie.space/api/v1/orders')
+  axios.get('https://zdorovie.space/api/v1/orders',{
+    headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+  })
   .then((res)=>{
     state.orders = res.data.orders;
+  })
+  .catch(function(error){
+    returnToLigonPage()
   })
 }
 

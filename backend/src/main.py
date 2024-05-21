@@ -315,7 +315,7 @@ def add_supplier(supplier: db_tools.Supplier) -> str:
 
 #получение всех поставщиков
 @app.get("/supplier", tags=["Поставщики"])
-def get_all_supplier() -> dict:
+def get_all_supplier(current_user: User = Depends(get_current_active_user)) -> dict:
     return {
         "suppliers": db_tools.allSupplier()
     }
@@ -342,7 +342,7 @@ def add_warehouse(warehouse:db_tools.Warehouse) -> str:
 
 
 @app.get('/warehouse/{w_id}', tags=["Склады"])
-def getInfoAboutWarehouse(w_id:int) -> dict:
+def getInfoAboutWarehouse(w_id:int, current_user: User = Depends(get_current_active_user)) -> dict:
     return {
         'warehouse_info': db_tools.getWarehouse(w_id),
         'medications':db_tools.getMedicationFromWareHouse(w_id),
@@ -350,7 +350,7 @@ def getInfoAboutWarehouse(w_id:int) -> dict:
 
 #получение всех складов
 @app.get("/warehouse", tags=["Склады"])
-def get_all_warehouse() -> dict:
+def get_all_warehouse(current_user: User = Depends(get_current_active_user)) -> dict:
     return {
         "warehouse": db_tools.allWarehouse()
     }
@@ -377,7 +377,7 @@ def add_medication(medication:db_tools.Medication) -> str:
 
 #получение всех медикаментов
 @app.get("/medication", tags=["Медикаменты"])
-def get_all_medication() -> dict:
+def get_all_medication(current_user: User = Depends(get_current_active_user)) -> dict:
     return {
         "medication": db_tools.allMedication()
     }
@@ -409,7 +409,7 @@ def delete_medication_from_warehouse(w_id: int, med_id: int) -> str:
 
 #получение всех заказов
 @app.get("/orders", tags=["Заказы"])
-def get_all_orders() -> dict:
+def get_all_orders(current_user: User = Depends(get_current_active_user)) -> dict:
     return {
         "orders": db_tools.allOrder()
     }

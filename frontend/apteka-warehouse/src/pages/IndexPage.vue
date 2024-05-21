@@ -10,7 +10,19 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+
+//роутер
+const router = useRouter()
+
 defineOptions({
   name: 'IndexPage'
 });
+
+
+onMounted(()=>{
+  router.push({name: 'Order'});
+})
 </script>

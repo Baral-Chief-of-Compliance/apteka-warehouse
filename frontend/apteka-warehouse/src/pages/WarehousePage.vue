@@ -195,12 +195,17 @@ columns : [
 // функция получения всех складов
 function getWarehouse(){
 axios.get(
-  "https://zdorovie.space/api/v1/warehouse"
+  "https://zdorovie.space/api/v1/warehouse", {
+    headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+  }
 )
 .then(function(response){
   state.warehouse = response.data.warehouse;
 }
 )
+.catch(function(error){
+    returnToLigonPage()
+  })
 }
 
 // функция для добавления склада

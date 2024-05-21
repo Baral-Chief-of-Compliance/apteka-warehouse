@@ -20,24 +20,34 @@ function returnToLigonPage(){
 // функция получения всех поставщиков
 function getSupplier(){
   return axios.get(
-    "https://zdorovie.space/api/v1/supplier"
+    "https://zdorovie.space/api/v1/supplier", {
+      headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+    }
   )
   .then((response) => {
     return response.data.suppliers;
   }
   )
+  .catch(function(error){
+    returnToLigonPage()
+  })
 }
 
 
 // функция получения всех медикаментов
 function getMed(){
   return axios.get(
-    "https://zdorovie.space/api/v1/medication"
+    "https://zdorovie.space/api/v1/medication", {
+      headers: {Authorization: `Bearer ${localStorage.getItem('access_token')}`}
+    }
   )
   .then((response) =>{
     return response.data.medication;
   }
   )
+  .catch(function(error){
+    returnToLigonPage()
+  })
 }
 
 
